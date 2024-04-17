@@ -5,6 +5,9 @@ app.LoadPlugin( "Utils" );
 var songs = ["Snd/Adam Szabo - Knock Me Out (Nader Alipour Remake).mid", "Snd/Edwan - Permich - Tropical.mid","Snd/Goldhands - Jasmina (Featuring LollieVox).mid","Snd/Nucleon - Shogun.mid","Snd/Permich - Arabic.mid"];
 function OnStart()
 {
+app.CopyFile( "Img/note.png", "/storage/emulated/0/Download/sqlite/note.png" );
+app.CopyFile( "Img/NoteBook.png", "/storage/emulated/0/Download/sqlite/My Notes.png" );
+
 utils = app.CreateUtils();
 	SetNotesData();
 //app.MakeFolder( app.GetAppPath()+"/Fonts" );
