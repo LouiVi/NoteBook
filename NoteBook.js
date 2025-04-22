@@ -1,5 +1,4 @@
-
-cfg.Light, cfg.Portrait, cfg.Share, cfg.MUI
+cfg.Light, cfg.Portrait, cfg.MUI
 
 app.LoadPlugin( "UIExtras" )
 app.LoadPlugin( "Utils" )
@@ -7,13 +6,29 @@ app.LoadPlugin( "OcrScanner" )
 app.LoadPlugin( 'Excel' )
 
 const fifthteen_hundred = 1500
+destFile = "";
+
+const Splash = function() {
+	layTemp = app.CreateLayout( "Linear", "VCenter, HCenter, FillXY" );
+	layTemp.SetBackground( "Img/carbon-blue.png" );
+	layTemp.Hide();
+	logo = app.CreateImage( "Img/LOGO-MULTISYSTEMS.png", 0.85, -1);
+	logo.Hide();
+	layTemp.AddChild( logo );
+	app.AddLayout( layTemp );
+	layTemp.Animate( "FallRotate", null, 1145 );
+	logo.Animate( "Rubberband" );
+	app.Wait( 4, true);
+	layTemp.Animate( "ScaleOut", null, 845 );
+	sI = setTimeout(()=>{app.RemoveLayout( layTemp );}, 3800);
+}
 
 function OnStart() {
- 
+ Splash();
  utils = app.CreateUtils()
  uix = app.CreateUIExtras()
  color = utils.RandomHexColor(false)
-ocr = app.CreateOCR()
+//ocr = app.CreateOCR()
  
   //Create recognition object and set callbacks.
  speech = app.CreateSpeechRec()
@@ -22,7 +37,7 @@ ocr = app.CreateOCR()
  speech.SetOnError( speech_OnError )
  
  lay = app.CreateLayout( "Linear", "FillXY" )
-
+color="#c4c4c4";
  txt = app.CreateText( "NoteBook", 1.0 )
  txt.SetFontFile( "Misc/LuckiestGuy-Regular.ttf" )
  txt.SetTextSize( 28 )
@@ -39,25 +54,27 @@ ocr = app.CreateOCR()
 
 */
 //alert(utils.GetMethods())
-color2 = utils.HexToLighterHex(color, 0.53)
+color2 = "#e73434";//utils.HexToLighterHex(color, 0.53)
 //alert(color2)
 color3 = utils.HexToLighterHex(utils.RandomHexColor(false), 0.74)
 lay2 = app.CreateLayout( "Linear", "Horizontal,FillX,VCenter" )
 lay2.SetBackGradient( utils.GetGradientColors(color2)[0], color2,  utils.GetGradientColors(color2)[1]/*"#f5f5f5","#838383","#9e9e9e"*/)
 lay2.SetElevation( 25 )
+lay2.SetGravity( "Right")
 //lay2.SetBackGradientRadial(0.5, 0.5, 100, "#ef9a9a","#b71c1c","#f44336" )
-btn = app.CreateButton( "[fa-calendar] Pick Date", 0.36, -1, "FontAwesome, Gray,Custom" )
-btn.SetTextSize( 13 )
-btn.SetBackGradient(utils.GetGradientColors(color3)[0], color3,  utils.GetGradientColors(color3)[1]);// "#9e9e9e","#f5f5f5","#838383")
-btn.SetTextColor( "#ffffff" )
-btn.SetTextShadow( 7, 2, 2, "#000000" )
+btn = app.CreateButton( "[fa-calendar] Selecciona Fecha", 0.396, -1, "FontAwesome, Gray,Custom" )
+btn.SetTextSize( 14.5)
+color4 ="#696969";
+btn.SetBackGradient(utils.GetGradientColors(color4)[0], color4,  utils.GetGradientColors(color4)[1]);// "#9e9e9e","#f5f5f5","#838383")
+btn.SetTextColor( "#efefef" )
+btn.SetTextShadow( 7, 1, 1, "#000000" )
  btn.SetOnTouch( btn_OnTouch )
  
  
  tdate = app.CreateText( "   "+new Date().toDateString(), 0.64, -1, "Left,VCenter")
  tdate.SetFontFile( "Misc/LuckiestGuy-Regular.ttf" )
  tdate.SetTextColor( "#ffffff" )
- tdate.SetTextShadow( 7, 2, 2, "#000000" )
+ tdate.SetTextShadow( 7, 1, 1, "#000000" )
  lay2.AddChild( btn )
  lay.AddChild( lay2 )
  lay2.AddChild( tdate)
@@ -84,8 +101,9 @@ btn.SetTextShadow( 7, 2, 2, "#000000" )
  list.SetTextColor2( "#000000" )
  list.SetTextShadow1( 3, 1,1, "#000000" )
  list.SetTextShadow2( 2,2,2,"#cdcdcd" )
- list.SetFontFile( "Misc/Iceland-Regular.ttf"/*"Misc/Merriweather-Light.ttf"*/ )
+ list.SetFontFile( "Misc/TitilliumWeb-Light.ttf");//Misc/Iceland-Regular.ttf"/*"Misc/Merriweather-Light.ttf"*/ )
  list.SetOnTouch( list_OnTouch )
+ list.SetOnLongTouch( list_OnLongTouch )
  lay.AddChild( list )
  app.AddLayout( lay )
 
@@ -106,19 +124,19 @@ fam = uix.CreateFAMenu( "[fa-book]", "Up,LabelsLeft" )
  fam.SetOnClosed( fam_OnClosed )
  layFam.AddChild( fam )
  
- fabReply = uix.CreateFAButton( "[fa-pencil]", "Mini" )
+ fabReply = uix.CreateFAButton( "[fa-pencil]", "" )
  fabReply.SetButtonColors( "#db4437", "#c33d32" )
  fabReply.SetOnTouch( fab_OnTouch )
  fabReply.SetLabel( "Write" )
  fam.AddFAButton( fabReply )
  
- fabReplyAll = uix.CreateFAButton( "[fa-microphone]", "Mini" )
+ fabReplyAll = uix.CreateFAButton( "[fa-microphone]", "" )
  fabReplyAll.SetButtonColors( "#db4437", "#c33d32" )
  fabReplyAll.SetOnTouch( ()=>{speech.Recognize()} )
  fabReplyAll.SetLabel( "Speak" )
  fam.AddFAButton( fabReplyAll )
  
- fabForward = uix.CreateFAButton( "[fa-send]", "Mini" )
+ fabForward = uix.CreateFAButton( "[fa-send]", "" )
  fabForward.SetButtonColors( "#fbbc05", "#efb306" )
  fabForward.SetOnTouch( ()=>{/*cam.Show() ocr.Scan( cam )*/var em = prompt("Enter the email address:","example@gmail.com");/*app.Alert( "Under Construction", "Information:", "", 112 )*/})
  fabForward.SetLabel( "Send to Email" )
@@ -149,12 +167,10 @@ fam = uix.CreateFAMenu( "[fa-book]", "Up,LabelsLeft" )
 SetNotesData()
 
  layFam.Animate( "RubberBand", ()=>{ lay2.Animate( "Jelly", ()=>{ txt.Animate( "NewsPaper", ()=>{btn.Animate( "NewsPaper", ()=>{tdate.Animate( "BounceRight", ()=>{list.Animate( "BounceLeft", null, fifthteen_hundred )}, fifthteen_hundred )}, fifthteen_hundred )}, fifthteen_hundred )}, fifthteen_hundred )}, fifthteen_hundred );
-  
-  destFile = "/storage/emulated/0/Download/sqlite/tts.wav"
-  //Create Audio Recorder and set dest file.
-	rec = app.CreateAudioRecorder()
-	rec.SetFile( destFile )
-//	ListDir();
+  //app.GetPermission(  )
+ 
+	//alert(GetFecha());
+//ListDir();
 	//ExcelData();
 	//var rw = prompt("Copy the path:", app.GetDatabaseFolder())
 }
@@ -163,7 +179,7 @@ SetNotesData()
 
 function ListDir()
 {
-alert(app.GetDatabaseFolder());
+//alert(app.GetDatabaseFolder());
     var delim = "\0";
     var list7= app.SysExec( 'ls -ap /data/user/0/com.smartphoneremote.androidscriptfree/databases/;exit', "sh,log" );
     list7= list7.split( "\n" ).join( delim );
@@ -220,11 +236,11 @@ String.prototype.padStart = padStart;//(2, '0')
 function GetFecha()
 {
 	var date = new Date()
-//	if(isDefined(cyear)){
+if(typeof cyear != "undefined"){
  date.setFullYear( cyear, cmonth, cday)
-// }else{
+ }else{
  //date.setFullYear( year, month, day)
- //}
+ }
 const month = (date.getMonth() + 1).toString().padStart(2, '0')
 const day = date.getDate().toString().padStart(2, '0')
 const year = date.getFullYear()
@@ -246,16 +262,16 @@ return `${month}/${day}/${year}`
 
 function picker_OnOk( year, month, day )
 {
-//app.ShowProgress( "Searching ...", "Solid")
+app.ShowProgress( "Searching ...", "Solid")
  var date = new Date()
  date.setFullYear( year, month, day)
  cyear = year
  cmonth = month
  cday = day
  //alert(date)
- tdate.SetText(  date.toDateString())
+ tdate.SetText(  "  " + date.toDateString())
  //app.ShowPopup( date.toDateString() )
-// app.HideProgress()
+app.HideProgress()
  app.ShowPopup( "Searching notes on: " + date.toDateString() )
  //Get all the table rows.  
     db.ExecuteSql( "select * from Notes Where SDate = '" + GetFecha() +"'", [], OnResult ) 
@@ -270,7 +286,9 @@ function OnDateChanged( year, month, day )
  cday = day
  app.ShowPopup( "Searching notes on: " + date.toDateString() )
  //Get all the table rows.  
-    db.ExecuteSql( "select * from Notes Where SDate = '" + GetFecha() +"'", [], OnResult ) 
+ sql = "select * from Notes Where SDate = '" + GetFecha() +"'";
+ //app.ShowPopup( sql );
+    db.ExecuteSql( sql, [], OnResult ) 
 }
 
 function PlayRecording()
@@ -278,21 +296,38 @@ function PlayRecording()
 	//Create media player.
 	player = app.CreateMediaPlayer()
 	//Load a file (can be ogg or mp3).
+	//alert(destFile)
 	player.SetFile( destFile )
-	player.Play()
+	player.SetOnReady( ()=>{player.Play()} );
+	//player.Play()
+}
+
+function list_OnLongTouch(title, body, icon, index)
+{
+	newValue = prompt("Enter the new value to update the entry:", body);
+	list.SetItem( title, title, newValue, icon );
+	db.ExecuteSql( "Update  Notes Set note = '" + newValue + "' Where note = '" + body + "'", null, null, OnError )  
+
+	
 }
 
 function list_OnTouch(title, body, icon, index)
 {
 	//Speak the text at default pitch and speed.
-	pitch = utils.RandomFloatRange(0.1, 1.9);
-speed= utils.RandomFloatRange(0.1, 1.9);
-
+	pitch = utils.RandomFloatRange(0.981, 1.029);
+speed= utils.RandomFloatRange(0.91, 1.19);
+alert(title.split("/").join("-").split(" ").join("").split(":").join("."));
+ destFile = "/storage/emulated/0/Download/notes/" + title.split("/").join("-").split(" ").join("").split(":").join(".") + ".wav"
+  //Create Audio Recorder and set dest file.
+	rec = app.CreateAudioRecorder();
+	rec.SetFile( destFile );
+	rec.SetSource( "VoiceRecognition");
 		//var pitch = 1.0, speed = 1.0
+		//app.DeleteFile( destFile)
 	rec.Start()
-	app.TextToSpeech( title + " " + body, pitch, speed,()=>{rec.Stop();PlayRecording()})
+	app.TextToSpeech( title + " " + body, pitch, speed,()=>{rec.Stop();if(utils.Confirm('Do you want to listen the recording?')) PlayRecording();})
 	//setTimeout(()=>{rec.Stop()}, 60000)
-	app.ShowPopup( title + " " + body, "Top" )
+	//app.ShowPopup( title + " " + body, "Top" )
 	/*email = app.CreateEmail( "luillosoftinc@gmail.com", "Crica&Culo" )
 	email.SetSMTP( "smtp.gmail.com", 465 )
 	//email.SetSMTP( "smtp.mail.yahoo.com", 465 )
@@ -347,7 +382,7 @@ function speech_OnResult( results )
     //Show the top result.
     app.ShowPopup( results[0] )
     
- list.AddItem( itemTitle, results[0], "Img/icon.png")
+ list.AddItem( itemTitle, results[0], "Img/NoteBook.png")
   db.ExecuteSql( "INSERT INTO Notes (title, note, posted_on, sdate)" +   
         " VALUES (?,?,?,?)", [itemTitle, results[0], d, SaveFecha()], null, OnError )  
 
@@ -385,11 +420,15 @@ function fab2_OnTouch()
 {
  dlg = app.CreateDialog( "NoteBook Settings:" )
 dlg.SetSize( 0.85, 0.85 )
- dlgLay = app.CreateLayout( "Linear", "Vertical, FillXY, VCenter" )
+ dlgLay = app.CreateLayout( "Linear", "Vertical, FillXY, HCenter" )
  dlgLay.SetPadding( 0.02, 0, 0.02, 0.02 )
  dlg.AddLayout( dlgLay )
 
-dlgSpinner = app.CreateSpinner( "-- Choose Theme --,Light,Dark" )
+dlgTxt = app.CreateText( "-- Choose Theme --", 0.8, -1, "Left" );
+dlgLay.AddChild( dlgTxt )
+dlgTxt.Hide();
+dlgSpinner = app.CreateSpinner( "-- Choose Theme --,Light,Dark" );
+dlgSpinner.SetOnChange( ()=>{dlgTxt.Show()} )
  //dlgTxt = app.CreateTextEdit( "", 0.8, 0.2, "Multiline" )
  //dlgTxt.SetHint( "Enter notes..." )
  dlgLay.AddChild( dlgSpinner )
@@ -431,7 +470,7 @@ var d = new Date().toISOString()
 var itemTitle = formatDate(new Date().toLocaleString())
 //var itemTitle = "#" + (list.GetLength() + 1 + ": " + formatDate(new Date().toLocaleString({timezone:'CARACAS/LA PAZ'}))) 
  //var itemTitle = "Note " + (list.GetLength() + 1)
- list.AddItem( itemTitle, dlgTxt.GetText().split("'").join("\'"), "Img/icon.png")
+ list.AddItem( itemTitle, dlgTxt.GetText().split("'").join("\'"), "Img/NoteBook.png")
  //Add some data (with error handler).  
     db.ExecuteSql( "INSERT INTO Notes (title, note, posted_on,sdate)" +   
         " VALUES (?,?,?,?)", [itemTitle, dlgTxt.GetText().split("'").join("\'"), d,SaveFecha()], null, OnError )  
@@ -493,15 +532,15 @@ function fab_OnMailForward()
 function SetNotesData()
 {
 
-if(!app.IsAPK()){
+//if(!app.IsAPK()){
 	//Create or open a database called "NoteBook".  
-    db = app.OpenDatabase( "NoteBook.sqlite.db" )
+    db = app.OpenDatabase( app.GetDatabaseFolder()+"/NoteBook.sqlite.db" )
     
-    }else{
-      db = app.OpenDatabase( "/data/user/0/com.smartphoneremote.androidscriptfree/databases/NoteBook.sqlite.db" )
+  //  }else{
+  //    db = app.OpenDatabase( "/data/user/0/com.smartphoneremote.androidscriptfree/databases/NoteBook.sqlite.db" )
     
    // db = app.OpenDatabase( "/data/user/0/com.luillosoftinc.notebook/databases/NoteBook.sqlite.db" )
-    }
+//    }
     
     
    // db = app.OpenDatabase("/data/user/0/com.smartphoneremote.androidscriptfree/databases/NoteBook.sqlite.db")
@@ -509,9 +548,10 @@ if(utils.Confirm("Drop Table Notes?")) db.ExecuteSql( "DROP TABLE Notes")
     //Create a table (if it does not exist already).  
     db.ExecuteSql( "CREATE TABLE IF NOT EXISTS Notes " +  
         "(id integer primary key autoincrement, title text, note text, posted_on timestamp, sdate text)" )  
-
+db.ExecuteSql("CREATE TABLE IF NOT EXISTS Configuration (id integer primary key autoincrement, theme text, language text);");
+//db.ExecuteSql("INSERT INTO Configuration (theme, language) ('Light', 'English');");
 //Get all the table rows.  
-    db.ExecuteSql( "select * from Notes", [], OnResult ) 
+    db.ExecuteSql( "select * from Notes  Where SDate = '" + GetFecha() +"'", [], OnResult ) 
 }
 
 //Callback to show errors.  
@@ -530,7 +570,7 @@ list.SetList( "" )
     {  
         var item = results.rows.item(i)
         if(s!="") s+= ","
-        s +=  item.title.split(":").join("^c^").split(",").join("") + ":" + item.note.split(",").join("") + ":Img/icon.png"   
+        s +=  item.title.split(":").join("^c^").split(",").join("") + ":" + item.note.split(",").join("") + ":Img/NoteBook.png"   
     }  
     list.SetList( s )
 }
